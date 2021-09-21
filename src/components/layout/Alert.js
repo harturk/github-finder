@@ -6,8 +6,8 @@ export const Alert = ({ alert }) => {
       /* Recebe como prop o tipo de alerta (alert-light)
       assim setando a cor conforme o arquivo css (app.css)
       */
-      <div> className={`alert alert-${alert.type}`}>
-      <i className="fas fa-info"/> {alert.msg}
+      <div className={`alert alert-${alert.type}`}>
+      <i className="fas fa-info-circle" /> { alert.msg }
       </div>
     )
   );

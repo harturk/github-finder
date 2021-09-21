@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import { Link } from 'react-router-dom';
 
 const Navbar = ({ icon, title }) => {
   return (
@@ -7,6 +8,16 @@ const Navbar = ({ icon, title }) => {
       <h1>
         <i className={icon} /> {title}
       </h1>
+      <ul>
+        <li>
+          {/* Pode-se utilizar a tag <a href="/">Home</a> no lugar de Link,
+          podem, desta forma, será perdida a pesquisa da página inicial (mudança de estado) */}
+          <Link to="/">Home</Link>
+        </li>
+        <li>
+          <Link to="/about">About</Link>
+        </li>
+      </ul>
     </nav>
   );
 };
