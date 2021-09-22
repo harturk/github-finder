@@ -1,29 +1,27 @@
-import React, { Fragment, Component } from "react";
+import React, { Fragment, useEffect } from "react";
 import Spinner from "../layout/Spinner";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import Repos from '../repos/Repos';
 
-export class User extends Component {
-  componentDidMount() {
+const User = ({ user, loading, getUser, getUserRepos, repos, match }) => {
+  useEffect(() => {
+    getUser(match.params.login);
+    getUserRepos(match.params.login);
+    // eslint-disable-next-line
+  }, []);
+  /* }, [repos]); -> Essa função irá rodar quando um parâmetro específico, setado
+  dentro dos [] for alterado. Como se quer que isso rode apenas uma vez, 
+  será utilizado um par de [] vazios, com a finalidade de imitar o comportamento
+  componentDidMount */
+
+
     /* Forma de puxar informação da url. Como a função getUser recebe username,
         que é a mesma coisa que :login, fará a requisição da mesma forma, trará
         as informações do usuário. O estado de usuário será preenchido com a resposta.
         Este estado está sendo passado dentro da tag <User
         */
-    this.props.getUser(this.props.match.params.login);
-    this.props.getUserRepos(this.props.match.params.login);
-  }
 
-    static propTypes = {
-      loading: PropTypes.bool,
-      user: PropTypes.object.isRequired,
-      getUser: PropTypes.func.isRequired,
-      getUserRepos: PropTypes.func.isRequired,
-      repos: PropTypes.array.isRequired,
-    };
-
-  render() {
     const {
       name,
       avatar_url,
@@ -38,9 +36,7 @@ export class User extends Component {
       public_gists,
       hireable,
       company,
-    } = this.props.user;
-
-    const { loading } = this.props;
+    } = user;
 
     if (loading) return <Spinner />;
 
@@ -112,10 +108,17 @@ export class User extends Component {
             <div className="badge badge-primary">Public Gists {public_gists}</div>
         </div>
 
-        <Repos repos={this.props.repos} />
+        <Repos repos={repos} />
       </Fragment>
     );
-  }
 }
+
+User.propTypes = {
+  loading: PropTypes.bool,
+  user: PropTypes.object.isRequired,
+  getUser: PropTypes.func.isRequired,
+  getUserRepos: PropTypes.func.isRequired,
+  repos: PropTypes.array.isRequired,
+};
 
 export default User;
