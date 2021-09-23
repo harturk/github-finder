@@ -11,11 +11,7 @@ import GithubState from "./context/github/GithubState";
 import "./App.css";
 
 const App = () => {
-  // Readaptando o estado abaixo com useState
-  const [users, setUsers] = useState([]);
-    // default object ({})
-  const [user, setUser] = useState({});
-    // default array ([])
+  // default array ([])
   const [repos, setRepos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState(null);
@@ -53,21 +49,6 @@ const App = () => {
   }
   */
 
-
-  // Get single Github user
-  const getUser = async (username) => {
-    setLoading(true);
-
-    const res = await axios.get(
-      /* O ponto de interrogação usado após ${username} serve para indicar que
-      o client_id é o primeiro parâmetro*/
-      `https://api.github.com/users/${username}?client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}&
-      client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`
-    );
-    setUser(res.data);
-    setLoading(false);
-  };
-
   // Get users repos
   const getUserRepos = async (username) => {
     setLoading(true);
@@ -83,9 +64,6 @@ const App = () => {
     setLoading(false);
   };
 
-  // Clear users from state
-  const clearUsers = () => this.setState({ users: [], loading: false });
-
   // Mensagem alerta
   const showAlert = (msg, type) => {
     setAlert({ msg, type });
@@ -94,58 +72,47 @@ const App = () => {
 
   // prop está chamando searchUsers: <Search searchUsers={this.searchUsers} />
   // O botão de limpar só será mostrado caso o array, que retorna pesquisa de usuários, for maior que 0
-    /*Após usar a desconstrução via atribuição, não será mais 
+  /*Após usar a desconstrução via atribuição, não será mais 
     necessário utilizar this.state ao lado de todas chamadas
     de users e loading*/
-    // const { users, user, loading } = this.state;
-    return (
-      <GithubState>
-        <Router>
-          <div className='App'>
-            <Navbar title='Github Finder' icon='fab fa-github' />
-            <div className='container'>
-              <Alert alert={alert} />
-              <Switch>
-                <Route
-                  exact
-                  path='/'
-                  render={(props) => (
-                    <Fragment>
-                      <Search
-                        // searchUsers está sendo passado pelo context
-                        // searchUsers={searchUsers}
-                        clearUsers={clearUsers}
-                        showClear={users.length > 0 ? true : false}
-                        setAlert={showAlert}
-                      />
-                      <Users
-                        loading={loading}
-                        users={users}
-                      />
-                    </Fragment>
-                  )}
-                />
-                <Route exact path='/about' component={About} />
-                <Route
-                  exact
-                  path='/user/:login'
-                  render={(props) => (
-                    <User
-                      {...props}
-                      getUser={getUser}
-                      user={getUser}
-                      loading={setLoading}
-                      getUserRepos={getUserRepos}
-                      repos={repos}
-                    />
-                  )}
-                />
-              </Switch>
-            </div>
+  // const { users, user, loading } = this.state;
+  return (
+    <GithubState>
+      <Router>
+        <div className='App'>
+          <Navbar title='Github Finder' icon='fab fa-github' />
+          <div className='container'>
+            <Alert alert={alert} />
+            <Switch>
+              <Route
+                exact
+                path='/'
+                render={(props) => (
+                  <Fragment>
+                    <Search setAlert={showAlert} />
+                    <Users />
+                  </Fragment>
+                )}
+              />
+              <Route exact path='/about' component={About} />
+              <Route
+                exact
+                path='/user/:login'
+                render={(props) => (
+                  <User
+                    {...props}
+                    loading={setLoading}
+                    getUserRepos={getUserRepos}
+                    repos={repos}
+                  />
+                )}
+              />
+            </Switch>
           </div>
-        </Router>
-      </GithubState>
-    );
-}
+        </div>
+      </Router>
+    </GithubState>
+  );
+};
 
 export default App;

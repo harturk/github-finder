@@ -23,37 +23,51 @@ const GithubState = (props) => {
     então é enviado um tipo para o reducer*/
   const [state, dispatch] = useReducer(GithubReducer, initialState);
 
-
-    // Search Github users
-    const searchUsers = async (text) => {
-        setLoading(true);
-        const res = await axios.get(
-            // Texto digitado no campo search, recebido como props,
-            // é passado para a query do github
-            `https://api.github.com/search/users?q=${text}&client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}&
+  // Search Github users
+  const searchUsers = async (text) => {
+    setLoading();
+    const res = await axios.get(
+      // Texto digitado no campo search, recebido como props,
+      // é passado para a query do github
+      `https://api.github.com/search/users?q=${text}&client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}&
             client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`
-        );
+    );
 
-        /* A resposta está em res.data.items - Como setUsers retorna um objeto
-        é necessário especificar o .items */ 
-        dispatch({
-            type: SEARCH_USERS,
-            // payload são os dados que se quer enviar - resposta
-            payload: res.data.items,
-        });
+    /* A resposta está em res.data.items - Como setUsers retorna um objeto
+        é necessário especificar o .items */
+    dispatch({
+      type: SEARCH_USERS,
+      // payload são os dados que se quer enviar - resposta
+      payload: res.data.items,
+    });
+  };
 
-        };
+  // Get single Github user
+  const getUser = async (username) => {
+    setLoading();
 
-  // Get User
+    const res = await axios.get(
+      /* O ponto de interrogação usado após ${username} serve para indicar que
+      o client_id é o primeiro parâmetro*/
+      `https://api.github.com/users/${username}?client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}&
+      client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`
+    );
+    dispatch({
+      type: GET_USER,
+      // payload são os dados que se quer enviar - resposta
+      payload: res.data,
+    });
+  };
 
   // Get Repos
 
-  // Clear Users
+  // Clear users from state
+  const clearUsers = () => dispatch({ type: CLEAR_USERS });
 
   // Set Loading
   const setLoading = () => {
-      dispatch({ type: SET_LOADING });
-  }
+    dispatch({ type: SET_LOADING });
+  };
 
   return (
     <GithubContext.Provider
@@ -63,7 +77,9 @@ const GithubState = (props) => {
         user: state.user,
         repos: state.repos,
         loading: state.loading,
-        searchUsers
+        searchUsers,
+        clearUsers,
+        getUser,
       }}
     >
       {props.children}
