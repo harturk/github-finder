@@ -9,6 +9,18 @@ import {
   GET_USER,
   GET_REPOS,
 } from "../types";
+
+let githubClientId;
+let githubClientSecret;
+
+if(process.env.NODE_ENV !== 'production'){
+  githubClientId = process.env.REACT_APP_GITHUB_CLIENT_ID;
+  githubClientSecret = process.env.REACT_APP_GITHUB_CLIENT_SECRET;
+} else{
+  githubClientId = process.env.GITHUB_CLIENT_ID;
+  githubClientSecret = process.env.GITHUB_CLIENT_SECRET;
+}
+
 // Criação estado inicial
 const GithubState = (props) => {
   const initialState = {
@@ -29,8 +41,8 @@ const GithubState = (props) => {
     const res = await axios.get(
       // Texto digitado no campo search, recebido como props,
       // é passado para a query do github
-      `https://api.github.com/search/users?q=${text}&client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}&
-            client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`
+      `https://api.github.com/search/users?q=${text}&client_id=${githubClientId}&
+            client_secret=${githubClientSecret}`
     );
 
     /* A resposta está em res.data.items - Como setUsers retorna um objeto
@@ -49,8 +61,8 @@ const GithubState = (props) => {
     const res = await axios.get(
       /* O ponto de interrogação usado após ${username} serve para indicar que
       o client_id é o primeiro parâmetro*/
-      `https://api.github.com/users/${username}?client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}&
-      client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`
+      `https://api.github.com/users/${username}?client_id=${githubClientId}&
+      client_secret=${githubClientSecret}`
     );
     dispatch({
       type: GET_USER,
@@ -59,7 +71,21 @@ const GithubState = (props) => {
     });
   };
 
-  // Get Repos
+  // Get users repos
+  const getUserRepos = async (username) => {
+    setLoading();
+
+    const res = await axios.get(
+      /* O ponto de interrogação usado após ${username} serve para indicar que
+      o client_id é o primeiro parâmetro*/
+      `https://api.github.com/users/${username}/repos?&per_page=5&sort=created:asc&client_id=${githubClientId}&
+      client_secret=${githubClientSecret}`
+    );
+    dispatch({
+      type: GET_REPOS,
+      payload: res.data,
+    });
+  };
 
   // Clear users from state
   const clearUsers = () => dispatch({ type: CLEAR_USERS });
@@ -80,6 +106,7 @@ const GithubState = (props) => {
         searchUsers,
         clearUsers,
         getUser,
+        getUserRepos,
       }}
     >
       {props.children}
